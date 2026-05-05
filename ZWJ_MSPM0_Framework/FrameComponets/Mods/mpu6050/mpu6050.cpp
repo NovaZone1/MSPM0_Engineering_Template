@@ -262,6 +262,9 @@ float MPU6050_GetGroZ(void) {
 
 float MPU6050_Getyaw(void) {
     yaw += 0.002 * (MPU6050_GetGroZ()-gyro_z_offset)/131.0f;
+    if(yaw<0)
+    return 12.2*yaw;
+    else 
     return 10*yaw;
     // 间隔2ms
 }

@@ -1,7 +1,7 @@
 #include "System.hpp"
 #include "Follow.hpp"
 #include "bsp_dwt.h"
-
+#include "mpu6050.hpp"
 RobotSystem &System = RobotSystem::GetInstance(); // 定义全局唯一的机器人系统实例
 
 /**
