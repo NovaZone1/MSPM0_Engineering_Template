@@ -19,7 +19,6 @@ void ControlTask(void *argument);
 void ApplicationTask(void *argument);
 void RobotSystemTask(void *argument);
 void StateCoreTask(void *argument);
-void PositionerTask(void *argument);
 
 int main(void) {
     BaseType_t xReturn; // 任务创建返回值
@@ -63,15 +62,6 @@ int main(void) {
     );
     configASSERT(xReturn == pdPASS);
 
-    xReturn = xTaskCreate(PositionerTask, /* pxTaskCode:    任务函数 */
-                          "Positioner",   /* pcName:        任务名称 */
-                          512,            /* uxStackDepth:  栈大小（字） */
-                          NULL,           /* pvParameters:  传递给任务的参数 */
-                          2,              /* uxPriority:    任务优先级 */
-                          NULL            /* pxCreatedTask: 任务句柄（不需要则为NULL） */
-    );
-    configASSERT(xReturn == pdPASS);
-
     vTaskStartScheduler();
 
     return (0);
@@ -95,11 +85,6 @@ void RobotSystemTask(void *argument) {
 void StateCoreTask(void *argument) {
     (void) argument;
     StateCoreCpp();
-}
-
-void PositionerTask(void *argument) {
-    (void) argument;
-    PositionerCpp();
 }
 
 static void prvSetupHardware(void) {

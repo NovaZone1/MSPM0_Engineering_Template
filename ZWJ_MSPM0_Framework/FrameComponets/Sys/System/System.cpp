@@ -1,7 +1,9 @@
 #include "System.hpp"
 #include "Follow.hpp"
 #include "bsp_dwt.h"
-#include "mpu6050.hpp"
+
+#define DIST_DIFF 10.0f
+
 RobotSystem &System = RobotSystem::GetInstance(); // 定义全局唯一的机器人系统实例
 
 /**
@@ -72,7 +74,7 @@ void RobotSystem::Run() {
 
     sys_oled.Show<float>(1, 7, StdMath::RpmToMS(6.5, motor_right.current_speed));
     sys_oled.Show<float>(2, 7, StdMath::RpmToMS(6.5, -motor_left.current_speed));
-    sys_oled.Show<float>(3, 7, follow_app.real_dist);
+    sys_oled.Show<float>(3, 7, (follow_app.real_dist - DIST_DIFF));
 
     // 零开销巡检所有 App 状态
     // for (int i = 0; i < 24; i++) {

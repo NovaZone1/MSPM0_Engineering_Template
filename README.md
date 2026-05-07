@@ -209,7 +209,7 @@ stateDiagram-v2
 
 ## 📝 关键设计
 
-- **强弱电隔离**：电机驱动 12V 与控制电路 3.3V 通过光耦 OR-3H7 完全隔离，PCB 分区铺铜，单点共地。
+- **强弱电隔离**：电机驱动 12V 与控制电路 5V 通过双电池方案完全隔离，PCB 分区铺铜，单点共地。
 - **ADC/DMA 采样**：灰度传感器使用 GPIO 中断采集，超声波使用硬件捕获定时器，避免 CPU 轮询。
 - **多模态速度整合**：`SpeedMixer` 根据优先级仲裁各个 App 的速度命令，解决冲突（导航 > 超车 > 掉头 > 跟车 > 巡线）。
 - **预分频可调**：每个 `Application` 可独立设置更新频率，节省 CPU 时间。
@@ -229,7 +229,7 @@ stateDiagram-v2
 
 ## 🤝 贡献者
 
-项目由南京理工大学 XX 学院 XX 队开发，团队成员：  
+项目由 南京理工大学 自动化学院 A1NJ48队 开发，团队成员：  
 - [zwj051029](https://github.com/zwj051029)
 - [NovaZone1](https://github.com/NovaZone1)  
 - [yekong6663](https://github.com/yekong6663) 

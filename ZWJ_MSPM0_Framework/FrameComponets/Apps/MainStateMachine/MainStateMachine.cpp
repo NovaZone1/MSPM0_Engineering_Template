@@ -80,35 +80,25 @@ void MainStateMachine::InitStateBlocks() {
 }
 
 void MainStateMachine::InitStateTransitions() {
-    // ========== 状态转换链接定义（核心！所有跳转都在这里） ==========
     // Idle → 巡线
     st_idle->LinkTo(&cond_start, *st_track);
 
-    // 巡线 ↔ 跟车
-    st_track->LinkTo(&cond_has_car, *st_follow);
+    // Track 的转换：优先检查返回起点 (Finish)，再检查掉头，最后检查跟车
+    st_track->LinkTo(&cond_return_start, *st_finish);     // ① 最高优先级
+    st_track->LinkTo(&cond_finish_line, *st_turn_around); // ② 终点掉头
+    st_track->LinkTo(&cond_has_car, *st_follow);          // ③ 有车跟车
+
+    // Follow 的转换
     st_follow->LinkTo(&cond_no_car, *st_track);
-
-    // // 巡线/跟车 → 超车
-    // st_track->LinkTo(&cond_dashed_line, *st_overtake);
-    // st_follow->LinkTo(&cond_dashed_line, *st_overtake);
-
-    // // 超车 → 跟车
-    // st_overtake->LinkTo(&cond_overtake_done, *st_follow);
-
-    // 巡线/跟车 → 掉头（终点线）
-    st_track->LinkTo(&cond_finish_line, *st_turn_around);
     st_follow->LinkTo(&cond_finish_line, *st_turn_around);
 
-    // 掉头 → 巡线
+    // 掉头完成 → 巡线
     st_turn_around->LinkTo(&cond_turn_done, *st_track);
 
-    // 巡线 → 结束（掉头后再次遇到起点线）
-    st_track->LinkTo(&cond_return_start, *st_finish);
-
-    // 任意状态 → 导航（暂未启用）
-    // st_track->LinkTo(&cond_nav_start, *st_navigation);
-    // st_follow->LinkTo(&cond_nav_start, *st_navigation);
-    // st_navigation->LinkTo(&cond_nav_done, *st_finish);
+    // 超车（暂屏蔽）
+    // st_track->LinkTo(&cond_dashed_line, *st_overtake);
+    // st_follow->LinkTo(&cond_dashed_line, *st_overtake);
+    // st_overtake->LinkTo(&cond_overtake_done, *st_follow);
 }
 
 // ========== 状态动作函数实现（核心联动逻辑） ==========
@@ -154,7 +144,7 @@ void MainStateMachine::ActionTrack(StateCore *core) {
     speed_mixer.ClearSource(SpeedMixer::Source::TURN_AROUND);
 
     // 3. 更新状态转换条件
-    cond_has_car = (follow_app.real_dist > 0 && follow_app.real_dist < 40.0f);
+    cond_has_car = (follow_app.real_dist > 0 && follow_app.real_dist < 50.0f);
     cond_no_car = !cond_has_car;
     cond_dashed_line = track_app.is_dashed_line;
     cond_finish_line = track_app.is_finish_line;
@@ -183,7 +173,7 @@ void MainStateMachine::ActionFollow(StateCore *core) {
     speed_mixer.ClearSource(SpeedMixer::Source::TURN_AROUND);
 
     // 3. 更新状态转换条件
-    cond_has_car = (follow_app.real_dist > 0 && follow_app.real_dist < 40.0f);
+    cond_has_car = (follow_app.real_dist > 0 && follow_app.real_dist < 50.0f);
     cond_no_car = !cond_has_car;
     cond_dashed_line = track_app.is_dashed_line;
     cond_finish_line = track_app.is_finish_line;
@@ -264,6 +254,7 @@ void MainStateMachine::ActionNavigation(StateCore *core) {
  * @note 所有 App 禁用，电机停止
  */
 void MainStateMachine::ActionFinish(StateCore *core) {
+    DL_GPIO_writePins(LED_PORT, LED_LED_PIN_PIN);
     // 1. 禁用所有 App
     track_app.SetEnable(false);
     follow_app.SetEnable(false);

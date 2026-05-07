@@ -2,6 +2,7 @@
 #include "Follow.hpp"
 #include "FreeRTOS.h"
 #include "MainFrame.hpp"
+#include "MainStateMachine.hpp"
 #include "SpeedMixer.hpp"
 #include "System.hpp"
 #include "bsp_delay.h"
@@ -10,7 +11,8 @@
 #include "motor_at8236.hpp"
 #include "std_cpp.h"
 #include "task.h"
-#include "MainStateMachine.hpp"
+
+#define SPEED_DIFF 15.0f
 
 float right_motor_speed = 0.0f;
 float left_motor_speed = 0.0f;
@@ -49,7 +51,7 @@ void ControlCpp() {
 
     while (1) {
         right_motor_speed = speed_mixer.GetFinalRightSpeed();
-        left_motor_speed = speed_mixer.GetFinalLeftSpeed() + 10.0f;
+        left_motor_speed = speed_mixer.GetFinalLeftSpeed() + SPEED_DIFF;
 
         if (MainStateMachine::cond_return_start) {
             right_motor_speed = 0.0f;
@@ -74,7 +76,7 @@ void StateCoreCpp() {
     StateCore &core = StateCore::GetInstance();
 
     while (1) {
-        // // 运行状态机核心
+        // 运行状态机核心
         core.Run();
         /***     最大循环频率：250Hz     ***/
         vTaskDelayUntil(&appTick, pdMS_TO_TICKS(4));
@@ -109,20 +111,6 @@ void RobotSystemCpp() {
         System.Run();
 
         /***    最大循环频率：200Hz     ***/
-        vTaskDelayUntil(&appTick, pdMS_TO_TICKS(5));
-    }
-}
-
-/**
- * @brief 机器人定位模块任务（500Hz）
- * @note 该任务负责机器人的定位数据更新
- */
-void PositionerCpp() {
-    TickType_t appTick = xTaskGetTickCount();
-
-    while (1) {
-
-        /***     最大循环频率：200Hz     ***/
         vTaskDelayUntil(&appTick, pdMS_TO_TICKS(5));
     }
 }

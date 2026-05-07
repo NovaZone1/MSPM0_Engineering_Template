@@ -1,5 +1,6 @@
 #include "Follow.hpp"
 #include "SpeedMixer.hpp"
+#include "Track.hpp"
 
 Follow &follow_app = Follow::GetInstance();
 
@@ -47,9 +48,15 @@ void Follow::Update() {
     speed_offset = Filter::FirstOrderComplementary(pid_out, last_offset, 0.6f);
     last_offset = speed_offset;
 
-    // 近距额外轻刹车，避免过激
-    if (real_dist < 18.0f) {
-        speed_offset -= 20.0f; // 轻刹，防止抖动
+    // 根据距离强制限制最大基础速度（核心修复）
+    if (real_dist < 25.0f) {
+        track_app.SetBaseSpeed(20.0f); // 极低速
+        speed_offset -= 40.0f;         // 额外强刹
+    } else if (real_dist < 30.0f) {
+        track_app.SetBaseSpeed(40.0f); // 中低速
+        speed_offset -= 20.0f;         // 轻度刹车
+    } else {
+        track_app.SetBaseSpeed(66.0f); // 恢复原基础速度
     }
 
     // 最终限幅：严格控制在 ±60 rpm，防止冲线
