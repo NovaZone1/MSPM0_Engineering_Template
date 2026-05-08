@@ -15,9 +15,12 @@ void vofa_send(float data) {
     vofa_buffer[cnt++] = 0x00;
     vofa_buffer[cnt++] = 0x00;
     vofa_buffer[cnt++] = 0x80;
-    vofa_buffer[cnt++] = 0x7f;
-    uint8_t i = 0;
-    for (i = 0; i < 8; i++) {
+    vofa_buffer[cnt++] = 0x7F;
+
+    for (uint8_t i = 0; i < cnt; i++) {
+        // 等待TX FIFO非满再发送（关键修复）
+        while (DL_UART_isTXFIFOFull(UART1))
+            ;
         DL_UART_transmitData(UART1, vofa_buffer[i]);
     }
     cnt = 0;

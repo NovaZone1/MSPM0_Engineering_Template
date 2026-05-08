@@ -1,6 +1,6 @@
 #include "mpu6050.hpp"
 #include "bsp_delay.h"
-
+#include <cmath>
 static float yaw = 0.0f;
 float gyro_z_offset = 0.0f;
 
@@ -261,10 +261,18 @@ float MPU6050_GetGroZ(void) {
 }
 
 float MPU6050_Getyaw(void) {
-    yaw += 0.002 * (MPU6050_GetGroZ()-gyro_z_offset)/131.0f;
-    if(yaw<0)
-    return 12.2*yaw;
+    // 1. 计算原始陀螺仪Z轴值
+    float raw_gyro_z = MPU6050_GetGroZ() + gyro_z_offset;
+    
+    // 2. 四舍五入保留一位小数（你可以换成上面任意一种方法）
+    float processed_gyro_z = (float)(int)std::round(raw_gyro_z * 10.0f) / 10.0f - 0.00001;
+    
+    // 3. 用处理后的值更新yaw
+    yaw += 0.0002 * processed_gyro_z / 100000000.0f; 
+    
+    // （原函数的返回逻辑有问题，正负都返回-yaw，这里先保留原样）
+    if(yaw < 0)
+        return -30000000.0 * yaw; 
     else 
-    return 10*yaw;
-    // 间隔2ms
+        return -1.0 * yaw;  
 }

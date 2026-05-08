@@ -49,7 +49,7 @@ namespace App {
 
 class Application {
     friend class RobotSystem;
-
+    
 private:
     char name[24];             // 应用名称
     uint8_t prescaler_cnt = 0; // 预分频计数器
@@ -100,7 +100,6 @@ class RobotSystem {
     friend void RobotSystemCpp();
     friend void ApplicationCpp();
     friend void StateCoreCpp();
-
     SINGLETON(RobotSystem) {};
 
 private:
@@ -163,7 +162,8 @@ private:
     Application *app_list[24]; // 系统中的应用实例列表
     uint8_t app_count = 0;     // 当前注册的应用实例数量
 
-    OLED sys_oled;
+    
+    
 
 public:
     // bool start_selfcheck_flag = false;      // 是否开始自检的标志
@@ -176,7 +176,7 @@ public:
     // void SetPositionSource(Vec3 &source); // 设置位置来源
 
     float runtime_tick; // 全局时间戳，单位s
-
+    OLED sys_oled;
     // /// @brief 全局唯一的监控核心
     // Monitor &monitor = Monitor::GetInstance();
     /// @brief 全局唯一的自动状态机核心

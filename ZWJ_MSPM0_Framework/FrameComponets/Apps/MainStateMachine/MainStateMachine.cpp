@@ -95,6 +95,8 @@ void MainStateMachine::InitStateTransitions() {
     // 掉头完成 → 巡线
     st_turn_around->LinkTo(&cond_turn_done, *st_track);
 
+    // st_->LinkTo(&cond_start, *st_navigation);
+
     // 超车（暂屏蔽）
     // st_track->LinkTo(&cond_dashed_line, *st_overtake);
     // st_follow->LinkTo(&cond_dashed_line, *st_overtake);
@@ -244,8 +246,17 @@ void MainStateMachine::ActionTurnAround(StateCore *core) {
  */
 void MainStateMachine::ActionNavigation(StateCore *core) {
     // 暂空，预留
+    track_app.SetEnable(false);
+    follow_app.SetEnable(false);
+    overtake_app.SetEnable(false);
+    turn_around_app.SetEnable(false);
     navigation_app.SetEnable(true);
-    speed_mixer.ClearAll();
+
+    speed_mixer.ClearSource(SpeedMixer::Source::TRACK);
+    speed_mixer.ClearSource(SpeedMixer::Source::FOLLOW);
+    speed_mixer.ClearSource(SpeedMixer::Source::OVERTAKE);
+    speed_mixer.ClearSource(SpeedMixer::Source::TURN_AROUND);
+    
     cond_nav_done = navigation_app.is_complete;
 }
 

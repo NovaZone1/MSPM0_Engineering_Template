@@ -1,7 +1,7 @@
 #include "System.hpp"
 #include "Follow.hpp"
 #include "bsp_dwt.h"
-
+#include "mpu6050.hpp"
 #define DIST_DIFF 10.0f
 
 RobotSystem &System = RobotSystem::GetInstance(); // 定义全局唯一的机器人系统实例
@@ -61,20 +61,21 @@ void RobotSystem::Run() {
 
 #ifndef __TASK_1_SHOW__
 #define __TASK_1_SHOW__
-    sys_oled.Show<string>(1, 1, "right:");
-    sys_oled.Show<string>(2, 1, "left :");
-    sys_oled.Show<string>(3, 1, "dist :");
+    // sys_oled.Show<string>(1, 1, "right:");
+    // sys_oled.Show<string>(2, 1, "left :");
+    // sys_oled.Show<string>(3, 1, "dist :");
 
-    sys_oled.Show<string>(1, 13, "m/s");
-    sys_oled.Show<string>(2, 13, "m/s");
-    sys_oled.Show<string>(3, 13, "cm");
+    // sys_oled.Show<string>(1, 13, "m/s");
+    // sys_oled.Show<string>(2, 13, "m/s");
+    // sys_oled.Show<string>(3, 13, "cm");
 
-    sys_oled.Show<string>(4, 6, "A1NJ48");
+    // sys_oled.Show<string>(4, 6, "A1NJ48");
 #endif
 
-    sys_oled.Show<float>(1, 7, StdMath::RpmToMS(6.5, motor_right.current_speed));
-    sys_oled.Show<float>(2, 7, StdMath::RpmToMS(6.5, -motor_left.current_speed));
-    sys_oled.Show<float>(3, 7, (follow_app.real_dist - DIST_DIFF));
+    // sys_oled.Show<float>(1, 7, StdMath::RpmToMS(6.5, motor_right.current_speed));
+    // sys_oled.Show<float>(2, 7, StdMath::RpmToMS(6.5, -motor_left.current_speed));
+    // sys_oled.Show<float>(3, 7, (follow_app.real_dist - DIST_DIFF));
+    
 
     // 零开销巡检所有 App 状态
     // for (int i = 0; i < 24; i++) {

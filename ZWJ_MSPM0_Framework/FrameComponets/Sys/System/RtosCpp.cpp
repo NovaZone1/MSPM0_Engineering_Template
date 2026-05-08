@@ -11,6 +11,7 @@
 #include "motor_at8236.hpp"
 #include "std_cpp.h"
 #include "task.h"
+#include "vofa.hpp"
 
 #define SPEED_DIFF 15.0f
 
@@ -24,6 +25,7 @@ float left_motor_speed = 0.0f;
  * @warning 为什么要搞一个这个，而不是在RTOS启动的线程初始化呢
  * 主要是因为怕线程爆栈，主函数的栈深基本上摸不到底的
  */
+
 void MainInitCpp() {
     System.Init();
     MainFrameCpp();
@@ -51,15 +53,15 @@ void ControlCpp() {
 
     while (1) {
         right_motor_speed = speed_mixer.GetFinalRightSpeed();
-        left_motor_speed = speed_mixer.GetFinalLeftSpeed() + SPEED_DIFF;
+        left_motor_speed = speed_mixer.GetFinalLeftSpeed();
 
         if (MainStateMachine::cond_return_start) {
             right_motor_speed = 0.0f;
             left_motor_speed = 0.0f;
         }
 
-        motor_right.SetSpeed(right_motor_speed);
         motor_left.SetSpeed(left_motor_speed);
+        motor_right.SetSpeed(right_motor_speed);
 
         Motor::ControlAllMotors();
         /***     最大循环频率：1000Hz     ***/

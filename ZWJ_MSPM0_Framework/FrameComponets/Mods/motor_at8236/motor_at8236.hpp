@@ -5,7 +5,6 @@
 #include "pid.hpp"
 #include "ti_msp_dl_config.h"
 
-
 typedef enum {
     Speed_Control_Mode,
     Pos_Control_Mode,
@@ -18,6 +17,7 @@ void EncoderISR();
 class Motor {
     friend void SpeedUpdateISR();
     friend void EncoderISR();
+    friend class Navigation;
 
 public:
     // pwm
@@ -30,10 +30,11 @@ public:
     MotorMode mode = Speed_Control_Mode;
 
     /// 编码器相关参数
-    BspGpio_Instance encoderA_inst;         // 霍尔编码器的A相
-    BspGpio_Instance encoderB_inst;         // 霍尔编码器的B相
-    int64_t pulse_count = 0;                // 带符号累计脉冲数，正转加，反转减
-    int64_t last_pulse_count = 0;           // 上一次速度更新时的脉冲计数
+    BspGpio_Instance encoderA_inst; // 霍尔编码器的A相
+    BspGpio_Instance encoderB_inst; // 霍尔编码器的B相
+    int64_t pulse_count = 0;        // 带符号累计脉冲数，正转加，反转减
+    int64_t last_pulse_count = 0;   // 上一次速度更新时的脉冲计数
+    int64_t delta = 0;
     uint16_t encoder_lines = 13;            // 编码器线数，单相每圈脉冲数
     uint16_t gear_ratio = 30;               // 减速比，电机轴转数 / 输出轴转数
     float speed_calculation_period = 0.01f; // M法计算周期
@@ -66,19 +67,18 @@ public:
     void SetPIDCoeffienct(float kp, float ki, float kd);
 };
 
-//请先注册
+// 请先注册
 extern Motor motor_left;
 extern Motor motor_right;
 
 // NVIC_EnableIRQ(GPIOA_INT_IRQn);
 //     NVIC_EnableIRQ(TIMG6_INT_IRQn);
-    
+
 //     //先左后右
 //     motor_left.Init(GPIOA, DL_GPIO_PIN_15, GPIOA, DL_GPIO_PIN_16, TIMG8, DL_TIMER_CC_1_INDEX, GPIOA, DL_GPIO_PIN_23);
 //     motor_left.Enable();
 //     motor_left.SetSpeed(80);
 
-//     motor_right.Init(GPIOA, DL_GPIO_PIN_12, GPIOA, DL_GPIO_PIN_13, TIMG7, DL_TIMER_CC_0_INDEX, GPIOA, DL_GPIO_PIN_27);
-//     motor_right.Enable();
-//     motor_right.SetSpeed(60);
-//     motor_right.SetPIDCoeffienct(2.0f, 5.0f, 0.000025f);
+//     motor_right.Init(GPIOA, DL_GPIO_PIN_12, GPIOA, DL_GPIO_PIN_13, TIMG7, DL_TIMER_CC_0_INDEX, GPIOA,
+//     DL_GPIO_PIN_27); motor_right.Enable(); motor_right.SetSpeed(60); motor_right.SetPIDCoeffienct(2.0f, 5.0f,
+//     0.000025f);
